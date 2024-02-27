@@ -1,2 +1,27 @@
 - Explain the order of execution in terms of the event loop for eventloop/immediate.js.
+
+1. fs.readFile is called to read the file './data/test.txt'.
+The callback function is provided to execute once the file reading operation is complete.
+
+2. Once the file reading operation is complete, the callback function is added to the event loop queue.
+The event loop will then pick up the callback and execute it.
+
+3. The callback contains a while loop that simulates a task taking 10ms to complete.
+During this time, the event loop is blocked because Node.js is single-threaded, and the while loop is synchronous.
+
+4. After the synchronous while loop, the code checks for errors during file reading.
+If there is an error, it logs 'Error'; otherwise, it logs the data.
+
+5. The code schedules a setTimeout with a 5ms delay. The callback for setTimeout is placed in the timers phase of the event loop.
+
+6. The code schedules a setImmediate callback. setImmediate callbacks are executed in the check/prepare phase of the event loop, which is executed after the I/O phase.
+
+7. The event loop moves to the check/prepare phase, where setImmediate callbacks are executed.
+The setImmediate callback is executed, and 'I was scheduled to run immediately' is logged.
+
+8. After completing the current cycle (which involves executing the callback, checking for errors, and logging), the event loop moves to the timers phase.
+The setTimeout callback is executed, and the delay since it was scheduled is logged.
+
 - Will the order of execution change if timeout is changed to 0? Why or why not?
+
+No, when the timeout is set to 0, the setTimeout callback will still be scheduled to run in the timers phase, but it will not be executed immediately. It will wait for the next iteration of the event loop.

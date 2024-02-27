@@ -1,1 +1,29 @@
 - In eventloop/timer.js, what will be the order of execution? Briefly explain the order of execution w.r.t the event loop phases.
+
+1. Execution begins with the initial call to foo(2).
+Inside foo(2), 'foo' is logged.
+A setTimeout is scheduled, which corresponds to the timers phase.
+baz() is called, logs 'baz', and completes. This completes a callback, which enters the pending callbacks phase.
+The event loop proceeds to the poll phase.
+
+2. The microtask queue contains the completion of baz(). This is executed as part of the poll phase.
+'baz' is logged.
+
+3. The callback queue now contains the callback from the setTimeout scheduled in foo(2).
+
+4. The event loop moves to the next tick, entering the timers phase.
+The callback from the setTimeout in foo(2) is executed. '2 : bar' is logged.
+
+5. Execution continues with the initial call to foo(1).
+Inside foo(1), 'foo' is logged.
+Another setTimeout is scheduled, corresponding to the timers phase.
+baz() is called, logs 'baz', and completes. This completes another callback, entering the pending callbacks phase.
+The event loop proceeds to the poll phase.
+
+6. The microtask queue contains the completion of baz() from foo(1). This is executed as part of the poll phase.
+'baz' is logged.
+
+7. The callback queue now contains the callback from the setTimeout scheduled in foo(1).
+
+8. The event loop moves to the next tick, entering the timers phase.
+The callback from the setTimeout in foo(1) is executed. '1 : bar' is logged.

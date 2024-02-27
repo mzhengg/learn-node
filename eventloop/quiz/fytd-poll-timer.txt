@@ -1,3 +1,31 @@
 - Explain the order of execution in terms of the event loop for eventloop/poll_timer.js.
+
+1. The event loop enters the timers phase.
+setTimeout callback is due, as 100 milliseconds have passed since its scheduling. The callback is executed, and the time elapsed since scheduling (101ms) is logged.
+
+2. The event loop enters the poll phase, waiting for I/O events.
+someAsyncOperation initiates the file read operation asynchronously.
+
+3. The file read operation initiated by someAsyncOperation completes, and the callback function is placed in the pending callbacks queue.
+
+4. The event loop moves to the next tick, entering the timers phase.
+The setTimeout callback is not due again, as it has already been executed.
+
+5. The event loop continues with the initial execution.
+The callback from the completed file read operation is executed. 'someAsyncOperation' is logged.
+
+6. Within the someAsyncOperation callback, there is a while loop that simulates a blocking operation for 10 milliseconds.
+After the blocking operation, the event loop continues with the initial execution.
+The entire script has completed.
+
 - Will the order of execution change if the delay in the while loop is changed from 10s to 150s? Why or why not?
+
+No, changing the duration of the while loop delay from 10 milliseconds to 150 milliseconds won't affect the overall order of execution. In such a scenario, the blocking while loop will still be completed before moving on to the next phases of the event loop. The setTimeout callback will still be executed after the file read operation completes and the blocking while loop finishes.
+
 - Will the order of execution change if timeout is changed to 0? Why or why not?
+
+Yes; When the timeout is set to 0 in the setTimeout function, it doesn't imply immediate execution. Instead, it means that the callback will be added to the callback queue as soon as the current execution stack is empty. This callback queue is processed by the event loop in the next tick.
+
+The non-deterministic aspect comes from the timing of the event loop and how quickly it can process the tasks in the callback queue. Factors such as the system's load, the efficiency of the event loop, and other external factors can influence the exact timing.
+
+Thus the exact timing of certain events in this environment can vary and is not guaranteed to be the same across different runs of the program or on different systems.
